@@ -1,11 +1,13 @@
 ﻿#include<stdio.h>
 int main(void)
 {
-	char str[10000];
-	int num;
-	while (scanf("%d", &num) == 1)
-		;
-	scanf("%s", str);
-	printf("%s", str);
-	return 0;
+   int x = 91, y = 100;
+   int temp = 0;
+   while (y > 0) {
+       if (x > 100) { x -= 10; y--; }
+       else x++;
+       temp++;
+   }
+   printf("%d", temp);
+    return 0;
 }

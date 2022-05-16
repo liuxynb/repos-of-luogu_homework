@@ -272,11 +272,11 @@ void sortList(LinkList &L)
     }
     listLen = ListLength(L);
     p = L;
-    for (i = 1; i < listLen; i++)
+    for (i = 0; i < listLen; i++)
     {
         swaped = 0;
-        p = L;
-        for (j = 0; j < listLen - i; j++)
+        p = L->next;
+        for (j = 0; j < listLen - i - 1; j++)
         {
             if (p->data > p->next->data)
             {
@@ -287,7 +287,7 @@ void sortList(LinkList &L)
             }
             p = p->next;
         }
-        if (swaped == 0) break;
+        //if (swaped == 0) break;
     }
 
 }
@@ -295,6 +295,7 @@ status RemoveNthFromEnd(LinkList& L, int n)
 //删除链表的倒数第n个结点：函数名称是RemoveNthFromEnd(L,n); 初始条件是线性表L已存在且非空, 操作结果是该链表中倒数第n个节点；
 {
     if (L == NULL||L->next == NULL) return INFEASIBLE;
+    if(n > ListLength(L)) return INFEASIBLE;
     LinkList end_node = L->next, delete_node = L->next, pre = NULL, next = L->next->next;
     for (int i = 0; i < n - 1; i++)
         end_node = end_node->next;
@@ -312,7 +313,6 @@ status RemoveNthFromEnd(LinkList& L, int n)
     free(delete_node);
     return OK;
 }
-
 status AddList(LISTS& Lists, char ListName[])
 // 只需要在Lists中增加一个名称为ListName的空线性表，线性表数据又后台测试程序插入。
 {    
@@ -335,6 +335,10 @@ status RemoveList(LISTS& Lists, char ListName[])
         }
     }
     return ERROR;
+}
+void ChangeList(LISTS Lists, LinkList &L, int i)
+{
+    L = Lists.elem[i].L;
 }
 int LocateList(LISTS Lists, char ListName[])
 // 在Lists中查找一个名称为ListName的线性表，成功返回逻辑序号，否则返回0
@@ -369,11 +373,11 @@ void main(void) {
         printf("    	  6. GetElem            12. ListTrabverse\n\n");
         printf("          EXTRA(Additional features)\n\n");
         printf("    	  13.reverseList        16. SaveList\n");
-        printf("    	  14. RemoveNthFromEnd       17. List Control\n");
-        printf("    	  15. sortList  \n");
+        printf("    	  14. RemoveNthFromEnd  17. List Control\n");
+        printf("    	  15. sortList          18.LoadList\n");
         printf("          0.Exit              \n");
         printf("--------------------------------------------------------\n");
-        printf("Please select what feature you need to use(just choose ONE)[0~17]:");
+        printf("Please select what feature you need to use(just choose ONE)[0~18]:");
         scanf("%d", &op);
         int i, num, ret, e;
         char ListName1[100];
@@ -511,12 +515,12 @@ void main(void) {
             int input;
             do
             {
-
                 printf("      Menu for Linear Table On Sequence Structure    \n");
                 printf("-------------------------------------------------\n");
                 printf("    	  1. AddList      \n");
                 printf("    	  2. RemoveList       \n");
                 printf("    	  3. LocateList       \n");
+                printf("    	  4. ChangeList       \n");
                 printf("    	  0. Exit       \n");
                 printf("-------------------------------------------------\n");
                 printf("    请选择你的操作[0~3]:");
@@ -525,35 +529,55 @@ void main(void) {
                 {
                 case 1:
 
-                    printf("输入新线性表的名字");
+                    printf("输入新线性表的名字\n");
                     scanf("%s", ListName1);
                     ret = AddList(Lists, ListName1);
-                    if (ret) printf("添加成功");
-                    else printf("添加失败");
+                    if (ret) printf("添加成功\n");
+                    else printf("添加失败\n");
                     getchar(); getchar();
                     break;
                 case 2:
-                    printf("输入需要删除的线性表的名字");
+                    printf("输入需要删除的线性表的名字\n");
                     scanf("%s", ListName1);
                     ret = RemoveList(Lists, ListName1);
-                    if (ret) printf("删除成功");
-                    else printf("删除失败");
+                    if (ret) printf("删除成功\n");
+                    else printf("删除失败\n");
                     getchar(); getchar();
                     break;
                 case 3:
-                    printf("输入需要查找的线性表的名字");
+                    printf("输入需要查找的线性表的名字\n");
                     scanf("%s", ListName1);
                     ret = LocateList(Lists, ListName1);
-                    if (!ret) printf("查找失败");
-                    else printf("成功，序号为%d", ret);
+                    if (!ret) printf("查找失败\n");
+                    else printf("成功，序号为%d\n", ret);
+                    getchar(); getchar();
+                    break;
+                case 4:
+                    printf("输入需要转换的线性表的名字\n");
+                    scanf("%s", ListName1);
+                    ret = LocateList(Lists, ListName1);
+                    if (!ret) { printf("查找失败\n"); break; }
+                    else printf("查找成功，已经变更！\n");
+                    ChangeList(Lists, L, ret);
                     getchar(); getchar();
                     break;
                 case 0:
                     break;
                 }
             } while (input);
-
-
+            getchar(); getchar();
+            break;
+        case 18:
+            //实现线性表的文件形式读取
+            printf("输入需要读入的文件名\n");
+            filename1[100] = {'0'};
+            scanf("%s", filename1);
+            ret = LoadList(L, filename1);
+            if (ret == (-1)) printf("ERROR!\n");
+            else printf("存入成功\n");
+            LoadList(L, filename1);
+            getchar(); getchar();
+            break;
         case 0:
             break;
         }//end of switch

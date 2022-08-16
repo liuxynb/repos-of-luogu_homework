@@ -2,6 +2,7 @@
 //  main.cpp
 //
 //  Created by 刘兴元 on 2022/5/9.
+//  Changed by 刘兴元 on 2022/5/16
 //
 #include<stdio.h>
 #include<stdlib.h>
@@ -500,6 +501,7 @@ status ForestPreTraverse(Forest F) {
 /*
 函数名称:ExchangeTree(Forest F, BiTree& T,char name[])
 初始条件:森林Forest存在
+操作结果:切换为该数并对其进行进一步操作。
 */
 status ExchangeTree(Forest F, BiTree& T,char name[]) {
 	if (F.Frorest_size == 0) {
@@ -509,7 +511,7 @@ status ExchangeTree(Forest F, BiTree& T,char name[]) {
 	if ((location = LocateTree(F, name)) == 0)return ERROR;
 	else
 	{
-		T = F.Tp[location].T;
+		T = F.Tp[location-1].T;
 	}
 	return OK;
 }

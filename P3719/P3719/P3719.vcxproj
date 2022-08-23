@@ -21,8 +21,8 @@
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
-    <ProjectGuid>{e5211ded-ec3e-4064-b8a2-0b7312e8f835}</ProjectGuid>
-    <RootNamespace>P1044</RootNamespace>
+    <ProjectGuid>{839effbf-6025-4326-8195-81d74ef8b35f}</ProjectGuid>
+    <RootNamespace>P3719</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -139,7 +139,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="P1044.cpp" />
+    <ClCompile Include="P3719.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

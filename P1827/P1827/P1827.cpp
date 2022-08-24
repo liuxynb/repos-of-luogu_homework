@@ -1,20 +1,26 @@
-﻿// P1827.cpp : 此文件包含 "main" 函数。程序执行将在此处开始并结束。
-//
-
-#include <iostream>
-
-int main()
+﻿#include<stdio.h>
+#include<string.h>
+char str1[10001], str2[10001];
+void DFS(int pre_le, int pre_r, int ino_le, int ino_r);
+int main(void)
 {
-    std::cout << "Hello World!\n";
+	scanf("%s%s", str1, str2);
+	int len = strlen(str1);
+	DFS(0, len - 1, 0, len - 1);
+	return 0;
 }
-
-// 运行程序: Ctrl + F5 或调试 >“开始执行(不调试)”菜单
-// 调试程序: F5 或调试 >“开始调试”菜单
-
-// 入门使用技巧: 
-//   1. 使用解决方案资源管理器窗口添加/管理文件
-//   2. 使用团队资源管理器窗口连接到源代码管理
-//   3. 使用输出窗口查看生成输出和其他消息
-//   4. 使用错误列表窗口查看错误
-//   5. 转到“项目”>“添加新项”以创建新的代码文件，或转到“项目”>“添加现有项”以将现有代码文件添加到项目
-//   6. 将来，若要再次打开此项目，请转到“文件”>“打开”>“项目”并选择 .sln 文件
+void DFS(int pre_le, int pre_r, int ino_le, int ino_r)
+{
+	if (pre_le > pre_le || ino_le > ino_r)return;
+	for (int i = pre_le; i <= pre_r; i++)
+	{
+		if (str1[i] == str2[ino_le])
+		{
+			DFS(pre_le, i - 1, ino_le + 1, ino_le + i - pre_le);
+			DFS(i + 1, ino_r, ino_le + i - pre_le + 1, ino_r);
+			printf("%c", str1[i]);
+		}
+		
+	}
+	
+}

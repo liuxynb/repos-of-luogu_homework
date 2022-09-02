@@ -31,9 +31,10 @@ typedef struct sudproblem {     //数独问题
 	int pattern[10][10];        //0表示挖出的洞，其他情况同ori
 	int num;                    //非0个数
 }Sud;
-typedef struct sudproblem_double {     //数独问题
-	int original[20][20];       //记录原始数值
-	int pattern[20][20];        //0表示挖出的洞，其他情况同ori
-	int num;                    //非0个数
-}Sud_double;
+typedef struct double_sud
+{
+	Sud* k1;
+	Sud* k2;
+}DSud;                          //储存双数独
+
 typedef int status;

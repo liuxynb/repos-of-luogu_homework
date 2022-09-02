@@ -31,7 +31,10 @@ int VarTrans(int i, int j, int n);            //变量转换函数，将语义编码转换为自
 void ReadSudFile(Sud* S, char FileName[200]); //读入一个数独文件
 void SudAns(struct problem* P, Sud* S);       //将变量值转换为数独答案
 void SudPlay();                               //可玩数独
-Sud* Sudcreate();                             //生成一个可以玩的数独
+DSud* Sudcreate();                             //生成一个可以玩的数独
 void DigHole(Sud* k);                         //给数独挖洞
+void DigHole2(Sud* k, Sud* k2);               //给数独挖洞,重合区域
 status Candig(Sud* k, int x, int y);          //判断是否为可以挖洞
+status Candig2(Sud* k, int x, int y);         //重合区域能否挖洞
 void hint(Sud* k);                            //给出提示
+void InputSud2(Sud* k, Sud* k2, problem* P);//将数独一与二的公共部分填入数独二中。

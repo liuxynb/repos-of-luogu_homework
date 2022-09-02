@@ -175,24 +175,61 @@ void SudPlay()
 		printf("   1.简单     2.中等     3.困难 \n");
 		scanf("%d", &diff);
 		printf("正在生成数独，请稍等……");
-		Sud* k = Sudcreate();//随机形成一个数独
+		DSud* K = Sudcreate();//随机形成一个数独
+		Sud* k = K->k1;
+		Sud* k2 = K->k2;
 		for (int i = 1; i <= 9; i++)
 			for (int j = 1; j <= 9; j++)
 				k->original[i][j] = k->pattern[i][j];
+		for (int i = 1; i <= 9; i++)
+			for (int j = 1; j <= 9; j++)
+				k2->original[i][j] = k2->pattern[i][j];
 		DigHole(k);//给数独挖洞
+		DigHole(k2);//给数独挖洞
+		for (int i = 7; i <= 9; i++)//恢复公共部分
+			for (int j = 7; j <= 9; j++)
+			{
+				k->original[i][j] = k->pattern[i][j]; k->num++;
+				k2->original[i-6][j-6] = k2->pattern[i-6][j-6]; k2->num++;
+			}
+
+		DigHole2(k, k2);//一起判断公共部分
 		for (int i = 1; i <= (3 - diff) * 10; i++) //根据难度给出提示
+		{
 			hint(k);
+			hint(k2);
+		}
 		op = 1;
 		while (op)
 		{
 			system("cls");
 			printf("------------sudoku------------\n\n");
-			for (int i = 1; i <= 9; i++) {
+			for (int i = 1; i <= 6; i++) {
 				for (int j = 1; j <= 9; j++) {
 					printf("%3d", k->original[i][j]);
 				}
 				printf("\n");
 			}
+			for (int i = 7; i <= 9; i++) {
+				//printf("                           ");
+				for (int j = 1; j <= 9; j++) {
+					printf("%3d", k->original[i][j]);
+				}
+				for (int j = 4; j <= 9; j++)
+				{
+					printf("%3d", k2->original[i][j]);
+				}
+				printf("\n");
+			}
+			for (int i = 4; i <= 9; i++) {
+				printf("                  ");
+				for (int j = 1; j <= 9; j++) {
+					printf("%3d", k2->original[i][j]);
+				}
+				printf("\n");
+			}
+		
+			
 			printf("------------------------------\n");
 			printf("\n1.填写        2.更多提示\n0.显示答案/退出\n");
 			scanf("%d", &op);
@@ -213,9 +250,27 @@ void SudPlay()
 				}
 			}
 		}
-		for (int i = 1; i <= 9; i++) {
+		for (int i = 1; i <= 6; i++) {
 			for (int j = 1; j <= 9; j++) {
 				printf("%3d", k->pattern[i][j]);
+			}
+			printf("\n");
+		}
+		for (int i = 7; i <= 9; i++) {
+			//printf("                           ");
+			for (int j = 1; j <= 9; j++) {
+				printf("%3d", k->pattern[i][j]);
+			}
+			for (int j = 4; j <= 9; j++)
+			{
+				printf("%3d", k2->pattern[i][j]);
+			}
+			printf("\n");
+		}
+		for (int i = 4; i <= 9; i++) {
+			printf("                  ");
+			for (int j = 1; j <= 9; j++) {
+				printf("%3d", k2->pattern[i][j]);
 			}
 			printf("\n");
 		}
@@ -233,14 +288,29 @@ void FormSudFile(FILE* fp, Sud* k) //将数独写入一个文件中
 		fprintf(fp, "\n");
 	}
 }
-Sud* Sudcreate() {
+void InputSud2(Sud* k, Sud* k2, problem* P)
+{
+	int i, j, n;
+	for (i = 7; i <= 9; i++)
+		for (j = 7; j <= 9; j++)
+			for (n = 1; n <= 9; n++)
+				if (P->ans[VarTrans(i, j, n)] == 1)
+				{
+					k2->original[i - 6][j - 6] = n;
+					k2->num++;
+				}
+}
+DSud* Sudcreate() 
+{
 	int x, y, v;
 	srand(time(NULL));
 	x = rand() % 9 + 1;//随机确定数独一个位置的数值
 	y = rand() % 9 + 1;
 	v = rand() % 9 + 1;
 	Sud* k = (Sud*)malloc(sizeof(Sud));
+	Sud* k2 = (Sud*)malloc(sizeof(Sud));
 	initS(k);
+	initS(k2);
 	k->num = 1;
 	k->original[x][y] = v;
 	FILE* fp = fopen("sud.txt", "w");
@@ -260,8 +330,29 @@ Sud* Sudcreate() {
 	t2 = clock();
 	SudAns(P, k);
 	k->num = 81;
-	return k;
+
+
+	//生成二号数独
+	InputSud2(k, k2, P);
+	FILE* fp2 = fopen("sud2.txt", "w");
+	FormSudFile(fp2, k2);//形成一个数独文件
+	fclose(fp2);
+	char temp2[200] = "sud2.txt";
+	transform(*k2, temp2);
+	problem* P2 = (problem*)malloc(sizeof(problem));
+	initP(P2);
+	fp2 = fopen(temp2, "r");
+	ReadFile(P2, fp2);
+	fclose(fp2);
+	solve(P2, 1, 0);//求解只含有一个数字的数独
+	SudAns(P2, k2);
+	k2->num = 81;
+	DSud *K = (DSud*)malloc(sizeof(DSud));
+	K->k1 = k;
+	K->k2 = k2;
+	return K;
 }
+
 void DigHole(Sud* k) {
 	for (int i = 1; i <= 9; i++) {
 		if (i % 2) {
@@ -272,6 +363,43 @@ void DigHole(Sud* k) {
 		else {
 			for (int j = 9; j >= 1; j--) {
 				Candig(k, i, j);
+			}
+		}
+	}
+}
+void DigHole2(Sud* k,Sud *k2) 
+{
+	for (int i = 1; i <= 3; i++) 
+	{
+		int flag1 = 0, flag2 = 0;
+		if (i % 2) 
+		{
+			for (int j = 1; j <= 3; j++) 
+			{
+				flag1 = Candig2(k, i + 6, j + 6);
+				flag2 = Candig2(k2, i, j);
+				if (flag1 && flag2)
+				{
+					k->original[i+6][j+6] = 0;//可以挖洞
+					k->num--;
+					k2->original[i][j] = 0;
+					k2->num--;
+				}
+			}
+		}
+		else 
+		{
+			for (int j = 3; j >= 1; j--) 
+			{
+				flag1 = Candig2(k, i + 6, j + 6);
+				flag2 = Candig2(k2, i, j);
+				if (flag1 && flag2)
+				{
+					k->original[i+6][j+6] = 0;//可以挖洞
+					k->num--;
+					k2->original[i][j] = 0;
+					k2->num--;
+				}
 			}
 		}
 	}
@@ -302,6 +430,30 @@ status Candig(Sud* k, int x, int y) //函数的修改都在original的基础上
 	k->num--;
 	return OK;
 }
+status Candig2(Sud* k, int x, int y) //函数的修改都在original的基础上
+{
+	char temp[200] = "temp";
+	FILE* fp1;
+	int flag;
+	if (k->original[x][y] == 0) return ERROR;
+	for (int i = 1; i <= 9; i++) //试填除原来数字之外的8个数字，若都不能满足说明可以挖洞
+	{
+		if (i == k->pattern[x][y]) continue;//和原数字相同，则比较下一个数字
+		k->original[x][y] = i;//给空格处填入一个数字，检查其是否有解
+		transform(*k, temp);//将挖洞位置填入其它值，生成新的cnf文件
+		problem* P = (problem*)malloc(sizeof(problem));
+		initP(P);
+		fp1 = fopen(temp, "r");
+		ReadFile(P, fp1);
+		fclose(fp1);
+		flag = solve(P, 1, 0);
+		if (flag == OK) {//若能满足，说明不能挖洞，给数独恢复其值
+			k->original[x][y] = k->pattern[x][y];
+			return ERROR;
+		}
+	}
+	return OK;
+}
 void hint(Sud* k) {
 	int x, y, flag;
 	flag = 1;
@@ -316,6 +468,3 @@ void hint(Sud* k) {
 	}
 }
 
-
-
-//双数独

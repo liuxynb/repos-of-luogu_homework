@@ -36,5 +36,5 @@ void DigHole(Sud* k);                         //给数独挖洞
 void DigHole2(Sud* k, Sud* k2);               //给数独挖洞,重合区域
 status Candig(Sud* k, int x, int y);          //判断是否为可以挖洞
 status Candig2(Sud* k, int x, int y);         //重合区域能否挖洞
-void hint(Sud* k);                            //给出提示
+void hint(Sud* k, Sud* k2);                            //给出提示
 void InputSud2(Sud* k, Sud* k2, problem* P);//将数独一与二的公共部分填入数独二中。

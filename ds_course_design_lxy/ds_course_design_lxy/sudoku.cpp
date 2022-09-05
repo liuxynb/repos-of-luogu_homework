@@ -196,8 +196,8 @@ void SudPlay()
 		DigHole2(k, k2);//一起判断公共部分
 		for (int i = 1; i <= (3 - diff) * 10; i++) //根据难度给出提示
 		{
-			hint(k);
-			hint(k2);
+			hint(k, k2);
+			
 		}
 		op = 1;
 		while (op)
@@ -233,7 +233,7 @@ void SudPlay()
 			printf("------------------------------\n");
 			printf("\n1.填写        2.更多提示\n0.显示答案/退出\n");
 			scanf("%d", &op);
-			if (op == 2) hint(k);
+			if (op == 2) hint(k, k2);
 			if (op == 1)
 			{
 				printf("\n输入填写的坐标与待填值:");
@@ -454,17 +454,21 @@ status Candig2(Sud* k, int x, int y) //函数的修改都在original的基础上
 	}
 	return OK;
 }
-void hint(Sud* k) {
+void hint(Sud* k,Sud* k2) 
+{
 	int x, y, flag;
 	flag = 1;
 	srand(time(NULL));
 	while (flag) {
 		x = rand() % 9 + 1;
 		y = rand() % 9 + 1;
-		if (!k->original[x][y]) {
+		if (!k->original[x][y]|| !k2->original[x][y]) 
+		{
 			k->original[x][y] = k->pattern[x][y];
+			k2->original[x][y] = k2->pattern[x][y];
 			flag = 0;
 		}
 	}
+
 }
 

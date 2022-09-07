@@ -3,19 +3,22 @@
 #pragma warning(disable:4996)
 #pragma warning(disable:6031)
 char FileName[200] = { '\0' };
-struct problem P;
+struct SAT P;
 Sud S;
-statement* p1 = NULL;
+clause* p1 = NULL;
 int main()
 {
 	int choice = 1, op1 = 1, op2 = 1;
 	int flag = 0;
 	while (choice) {
 		system("cls");
-		printf("                    Menu for SAT Solver based on DPLL                   \n");
-		printf("------------------------------------------------------------------------\n");
-		printf("                     1.SAT     2.Sudoku    0.Exit                       \n");
-		printf("------------------------------------------------------------------------\n");
+		printf("\n\n                    Menu for SAT Solver based on DPLL                   \n\n");
+		printf("------------------------------------------------------------------------\n\n");
+		printf("                                 1.SAT                                  \n\n");
+		printf("                                 2.Sudoku                               \n\n");
+		printf("                                 0.Exit                                 \n\n");
+		printf("------------------------------------------------------------------------\n\n");
+		printf("Input operator:[0~2]\n");
 		scanf("%d", &choice);
 		if (choice == 1)//进入SAT问题
 		{
@@ -23,8 +26,14 @@ int main()
 			while (op1)
 			{
 				system("cls");
+				printf("\n\n                             *SAT Solver*\n");
 				printf("-------------------------------------------------------------------------\n");
-				printf("1.Read File  2.Print File  3.DPLL  4.Print Answer  5.Check Answer  0.Back\n");
+				printf("                             1.Read File\n\n");
+				printf("                             2.Print File\n\n");
+				printf("                             3.DPLL\n\n");
+				printf("                             4.Print Answer\n\n");
+				printf("                             5.Check Answer\n\n");
+				printf("                             0.Back\n");
 				printf("-------------------------------------------------------------------------\n");
 				scanf("%d", &op1);
 				FILE* fp = NULL;
@@ -34,7 +43,7 @@ int main()
 					scanf("%s", FileName);
 					fp = fopen(FileName, "r");
 					initP(&P);
-					_ReadFile(&P, fp);
+					ReadFile_check(&P, fp);
 					if (fp) {
 						ReadFile(&P, fp);
 						printf("文件中共有%d个变量，%d个子句\n", P.vnum, P.stnum);

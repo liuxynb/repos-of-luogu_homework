@@ -1,40 +1,44 @@
 #pragma once
 #pragma once
 #include"def.h"
-void DPLL(struct problem* P);                     //DPLL算法
-void initP(struct problem* P);                    //初始化问题
-void _ReadFile(struct problem* P, FILE* fp);      //读取一个cnf文件的注释
-void ReadFile(struct problem* P, FILE* fp);       //读取一个cnf文件的各个子句
-void PrintFile(struct problem* P);                //打印cnf文件中的各个子句
-int FindUnitClause(struct problem* P);            //在子句集中找到一个单子句，返回该单子句中所包含的文字的值
-status DeleteUnitClause(struct problem* P, int x, int depth);//从子句集中删除包含x的子句，并从各个子句删除文字-x，保存删除时的深度depth
-void recover(struct problem* P, int depth);       //复原在回溯深度为depth时被删除的子句或句子
-void AddUnitClause(struct problem* P, int x);     //在P的根节点后运用首插法插入一个单子句，单子句中唯一文字的值为x
-void FreeClause(statement* s);                    //释放子句s的空间(仅释放s的空间，不考虑指向子句s的前一子句和s指向的后一子句)
-void DeleteFirstClause(struct problem* P);        //删除AddUnitClause函数插入的第一个子句，并释放其储存空间
-int SelectMax(struct problem* P);                 //找到一个出现次数最多的变量，返回变量的值，返回值总是正值
-void PrintCount(struct problem* P);               //打印各个变量出现的次数
-status solve(struct problem* P, int depth, int x);//对SAT问题求解，P为所求解的问题，depth为已经进行的深度，x为线索变量
-void FormAnsFile(struct problem* P, int result, int time, char name[200]);
-//给后缀为.cnf的文件形成其对应的答案文件，result为运行结果，time为运行时间，name为cnf文件名
-void PrintAns(struct problem P);                  //打印SAT文件的答案
-status CheckAns(struct problem P);                //检查答案是否正确
-status solve1(struct problem* P, int depth, int x);
-int SelectFirst(struct problem* P);
+void DPLL(struct SAT* P);                     
+void initP(struct SAT* P);                    
+void ReadFile_check(struct SAT* P, FILE* fp);     
+void ReadFile(struct SAT* P, FILE* fp);       
+void PrintFile(struct SAT* P);               
+int FindUnitClause(struct SAT* P);            
+status DeleteUnitClause(struct SAT* P, int x, int depth);
+void recover(struct SAT* P, int depth);      
+void AddUnitClause(struct SAT* P, int x);     
+void FreeClause(clause* s);                    
+void DeleteFirstClause(struct SAT* P);        
+int SelectMax(struct SAT* P);                 
+void PrintCount(struct SAT* P);               
+status solve(struct SAT* P, int depth, int x);
+void FormAnsFile(struct SAT* P, int result, int time, char name[200]);
+void PrintAns(struct SAT P);                  
+status CheckAns(struct SAT P);                
+status solve1(struct SAT* P, int depth, int x);
+int SelectFirst(struct SAT* P);
+double J(int n);
+int getNextBool_2SidedJW_optimized(clause* cnf);
+int getNextBool_Positive_2SidedJW(clause* cnf);
 
 
-void SudSolve();                              //求解一个数独
-void transform(Sud S, char FileName[200]);    //将数独文件转换为CNF文件
-void PrintSud(Sud S);                         //打印数独样式
-void initS(Sud* S);                           //初始化数独问题S
-int VarTrans(int i, int j, int n);            //变量转换函数，将语义编码转换为自然顺序编码，输入变量名i行j列填入数字n
-void ReadSudFile(Sud* S, char FileName[200]); //读入一个数独文件
-void SudAns(struct problem* P, Sud* S);       //将变量值转换为数独答案
-void SudPlay();                               //可玩数独
-DSud* Sudcreate();                             //生成一个可以玩的数独
-void DigHole(Sud* k);                         //给数独挖洞
-void DigHole2(Sud* k, Sud* k2);               //给数独挖洞,重合区域
-status Candig(Sud* k, int x, int y);          //判断是否为可以挖洞
-status Candig2(Sud* k, int x, int y);         //重合区域能否挖洞
-void hint(Sud* k, Sud* k2);                            //给出提示
-void InputSud2(Sud* k, Sud* k2, problem* P);//将数独一与二的公共部分填入数独二中。
+
+
+void SudSolve();                              
+void transformToCnf(Sud S, char FileName[200]);    
+void PrintSud(Sud S);                         
+void initS(Sud* S);                          
+int VarTrans(int i, int j, int n);            
+void ReadSudFile(Sud* S, char FileName[200]); 
+void SudAns(struct SAT* P, Sud* S);       
+void SudPlay();                              
+DSud* Sudcreate();                             
+void DigHole(Sud* k);                         
+void DigHole2(Sud* k, Sud* k2);               
+status Candig(Sud* k, int x, int y);         
+status Candig2(Sud* k, int x, int y);       
+void hint(Sud* k, Sud* k2);                            
+void InputSud2(Sud* k, Sud* k2, SAT* P);

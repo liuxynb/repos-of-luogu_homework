@@ -3,16 +3,17 @@
 #pragma warning(disable:4996)
 #pragma warning(disable:6031)
 extern char FileName[200];
-extern struct problem P;
+extern struct SAT P;
 extern Sud S;
-extern statement* p1;
+extern clause* p1;
+//求解一个数独
 void SudSolve() {
 	initS(&S);
 	printf("请输入测试文件名:");
 	scanf("%s", FileName);
 	ReadSudFile(&S, FileName);
-	transform(S, FileName);
-	problem* P = (problem*)malloc(sizeof(problem));
+	transformToCnf(S, FileName);
+	SAT* P = (SAT*)malloc(sizeof(SAT));
 	initP(P);
 	FILE* fp = fopen(FileName, "r");
 	ReadFile(P, fp);
@@ -24,16 +25,19 @@ void SudSolve() {
 	SudAns(P, &S);
 	PrintSud(S);
 }
+//变量转换函数，将语义编码转换为自然顺序编码，输入变量名i行j列填入数字n
 int VarTrans(int i, int j, int n) {
 	return (i - 1) * 81 + (j - 1) * 9 + n;
 }
+//初始化数独
 void initS(Sud* S)
 {
 	for (int i = 0; i <= 9; i++)
 		for (int j = 0; j <= 9; j++)
-			S->original[i][j] = S->pattern[i][j] = 0;
+			S->original[i][j] = S->answer[i][j] = 0;
 	S->num = 0;
 }
+//读入一个数独文件
 void ReadSudFile(Sud* S, char FileName[200])
 {
 	char ch;
@@ -56,6 +60,7 @@ void ReadSudFile(Sud* S, char FileName[200])
 	fclose(fp);
 	return;
 }
+//打印数独样式
 void PrintSud(Sud S)
 {
 	printf("原数独中共有%d个提示数字，初始形式如下：\n", S.num);
@@ -69,12 +74,13 @@ void PrintSud(Sud S)
 	for (int i = 1; i <= 9; i++)
 	{
 		for (int j = 1; j <= 9; j++)
-			printf("%3d", S.pattern[i][j]);
+			printf("%3d", S.answer[i][j]);
 		printf("\n");
 	}
 	return;
 }
-void transform(Sud S, char FileName[200])
+//将数独文件转换为CNF文件
+void transformToCnf(Sud S, char FileName[200])
 {
 	int len = strlen(FileName);
 	FileName[len] = '.'; FileName[len + 1] = 'c'; FileName[len + 2] = 'n'; FileName[len + 3] = 'f';
@@ -156,15 +162,17 @@ void transform(Sud S, char FileName[200])
 	//将规则录入cnf文件
 	fclose(fp);
 }
-void SudAns(struct problem* P, Sud* S)
+//将变量值转换为数独答案
+void SudAns(struct SAT* P, Sud* S)
 {
 	int i, j, n;
 	for (i = 1; i <= 9; i++)
 		for (j = 1; j <= 9; j++)
 			for (n = 1; n <= 9; n++)
 				if (P->ans[VarTrans(i, j, n)] == 1)
-					S->pattern[i][j] = n;
+					S->answer[i][j] = n;
 }
+//可玩数独
 void SudPlay()
 {
 	int choice = 1, diff, op;
@@ -180,17 +188,17 @@ void SudPlay()
 		Sud* k2 = K->k2;
 		for (int i = 1; i <= 9; i++)
 			for (int j = 1; j <= 9; j++)
-				k->original[i][j] = k->pattern[i][j];
+				k->original[i][j] = k->answer[i][j];
 		for (int i = 1; i <= 9; i++)
 			for (int j = 1; j <= 9; j++)
-				k2->original[i][j] = k2->pattern[i][j];
+				k2->original[i][j] = k2->answer[i][j];
 		DigHole(k);//给数独挖洞
 		DigHole(k2);//给数独挖洞
 		for (int i = 7; i <= 9; i++)//恢复公共部分
 			for (int j = 7; j <= 9; j++)
 			{
-				k->original[i][j] = k->pattern[i][j]; k->num++;
-				k2->original[i-6][j-6] = k2->pattern[i-6][j-6]; k2->num++;
+				k->original[i][j] = k->answer[i][j]; k->num++;
+				k2->original[i-6][j-6] = k2->answer[i-6][j-6]; k2->num++;
 			}
 
 		DigHole2(k, k2);//一起判断公共部分
@@ -238,10 +246,10 @@ void SudPlay()
 			{
 				printf("\n输入填写的坐标与待填值:");
 				scanf("%d%d%d", &x, &y, &v);
-				if (!k->original[x][y] && v == k->pattern[x][y])
+				if (!k->original[x][y] && v == k->answer[x][y])
 				{
 					printf("\n填写正确!\n");
-					k->original[x][y] = k->pattern[x][y];
+					k->original[x][y] = k->answer[x][y];
 					getchar(); getchar();
 				}
 				else {
@@ -252,25 +260,25 @@ void SudPlay()
 		}
 		for (int i = 1; i <= 6; i++) {
 			for (int j = 1; j <= 9; j++) {
-				printf("%3d", k->pattern[i][j]);
+				printf("%3d", k->answer[i][j]);
 			}
 			printf("\n");
 		}
 		for (int i = 7; i <= 9; i++) {
 			//printf("                           ");
 			for (int j = 1; j <= 9; j++) {
-				printf("%3d", k->pattern[i][j]);
+				printf("%3d", k->answer[i][j]);
 			}
 			for (int j = 4; j <= 9; j++)
 			{
-				printf("%3d", k2->pattern[i][j]);
+				printf("%3d", k2->answer[i][j]);
 			}
 			printf("\n");
 		}
 		for (int i = 4; i <= 9; i++) {
 			printf("                  ");
 			for (int j = 1; j <= 9; j++) {
-				printf("%3d", k2->pattern[i][j]);
+				printf("%3d", k2->answer[i][j]);
 			}
 			printf("\n");
 		}
@@ -279,7 +287,8 @@ void SudPlay()
 		scanf("%d", &choice);
 	}
 }
-void FormSudFile(FILE* fp, Sud* k) //将数独写入一个文件中
+//将数独写入一个文件中
+void FormSudFile(FILE* fp, Sud* k) 
 {
 	for (int i = 1; i <= 9; i++) {
 		for (int j = 1; j <= 9; j++) {
@@ -288,7 +297,8 @@ void FormSudFile(FILE* fp, Sud* k) //将数独写入一个文件中
 		fprintf(fp, "\n");
 	}
 }
-void InputSud2(Sud* k, Sud* k2, problem* P)
+//将数独一与二的公共部分填入数独二中。
+void InputSud2(Sud* k, Sud* k2, SAT* P)
 {
 	int i, j, n;
 	for (i = 7; i <= 9; i++)
@@ -300,6 +310,7 @@ void InputSud2(Sud* k, Sud* k2, problem* P)
 					k2->num++;
 				}
 }
+//生成一个可以玩的数独
 DSud* Sudcreate() 
 {
 	int x, y, v;
@@ -318,8 +329,8 @@ DSud* Sudcreate()
 	fclose(fp);
 
 	char temp[200] = "sud.txt";
-	transform(*k, temp);
-	problem* P = (problem*)malloc(sizeof(problem));
+	transformToCnf(*k, temp);
+	SAT* P = (SAT*)malloc(sizeof(SAT));
 	initP(P);
 	fp = fopen(temp, "r");
 	ReadFile(P, fp);
@@ -338,8 +349,8 @@ DSud* Sudcreate()
 	FormSudFile(fp2, k2);//形成一个数独文件
 	fclose(fp2);
 	char temp2[200] = "sud2.txt";
-	transform(*k2, temp2);
-	problem* P2 = (problem*)malloc(sizeof(problem));
+	transformToCnf(*k2, temp2);
+	SAT* P2 = (SAT*)malloc(sizeof(SAT));
 	initP(P2);
 	fp2 = fopen(temp2, "r");
 	ReadFile(P2, fp2);
@@ -352,7 +363,7 @@ DSud* Sudcreate()
 	K->k2 = k2;
 	return K;
 }
-
+//给数独挖洞
 void DigHole(Sud* k) {
 	for (int i = 1; i <= 9; i++) {
 		if (i % 2) {
@@ -367,6 +378,7 @@ void DigHole(Sud* k) {
 		}
 	}
 }
+//给数独挖洞,重合区域
 void DigHole2(Sud* k,Sud *k2) 
 {
 	for (int i = 1; i <= 3; i++) 
@@ -404,6 +416,7 @@ void DigHole2(Sud* k,Sud *k2)
 		}
 	}
 }
+//判断是否为可以挖洞
 status Candig(Sud* k, int x, int y) //函数的修改都在original的基础上
 {
 	char temp[200] = "temp";
@@ -412,17 +425,17 @@ status Candig(Sud* k, int x, int y) //函数的修改都在original的基础上
 	if (k->original[x][y] == 0) return ERROR;
 	for (int i = 1; i <= 9; i++) //试填除原来数字之外的8个数字，若都不能满足说明可以挖洞
 	{
-		if (i == k->pattern[x][y]) continue;//和原数字相同，则比较下一个数字
+		if (i == k->answer[x][y]) continue;//和原数字相同，则比较下一个数字
 		k->original[x][y] = i;//给空格处填入一个数字，检查其是否有解
-		transform(*k, temp);//将挖洞位置填入其它值，生成新的cnf文件
-		problem* P = (problem*)malloc(sizeof(problem));
+		transformToCnf(*k, temp);//将挖洞位置填入其它值，生成新的cnf文件
+		SAT* P = (SAT*)malloc(sizeof(SAT));
 		initP(P);
 		fp1 = fopen(temp, "r");
 		ReadFile(P, fp1);
 		fclose(fp1);
 		flag = solve(P, 1, 0);
 		if (flag == OK) {//若能满足，说明不能挖洞，给数独恢复其值
-			k->original[x][y] = k->pattern[x][y];
+			k->original[x][y] = k->answer[x][y];
 			return ERROR;
 		}
 	}
@@ -430,6 +443,7 @@ status Candig(Sud* k, int x, int y) //函数的修改都在original的基础上
 	k->num--;
 	return OK;
 }
+//重合区域能否挖洞
 status Candig2(Sud* k, int x, int y) //函数的修改都在original的基础上
 {
 	char temp[200] = "temp";
@@ -438,22 +452,23 @@ status Candig2(Sud* k, int x, int y) //函数的修改都在original的基础上
 	if (k->original[x][y] == 0) return ERROR;
 	for (int i = 1; i <= 9; i++) //试填除原来数字之外的8个数字，若都不能满足说明可以挖洞
 	{
-		if (i == k->pattern[x][y]) continue;//和原数字相同，则比较下一个数字
+		if (i == k->answer[x][y]) continue;//和原数字相同，则比较下一个数字
 		k->original[x][y] = i;//给空格处填入一个数字，检查其是否有解
-		transform(*k, temp);//将挖洞位置填入其它值，生成新的cnf文件
-		problem* P = (problem*)malloc(sizeof(problem));
+		transformToCnf(*k, temp);//将挖洞位置填入其它值，生成新的cnf文件
+		SAT* P = (SAT*)malloc(sizeof(SAT));
 		initP(P);
 		fp1 = fopen(temp, "r");
 		ReadFile(P, fp1);
 		fclose(fp1);
 		flag = solve(P, 1, 0);
 		if (flag == OK) {//若能满足，说明不能挖洞，给数独恢复其值
-			k->original[x][y] = k->pattern[x][y];
+			k->original[x][y] = k->answer[x][y];
 			return ERROR;
 		}
 	}
 	return OK;
 }
+//给出提示
 void hint(Sud* k,Sud* k2) 
 {
 	int x, y, flag;
@@ -464,8 +479,8 @@ void hint(Sud* k,Sud* k2)
 		y = rand() % 9 + 1;
 		if (!k->original[x][y]|| !k2->original[x][y]) 
 		{
-			k->original[x][y] = k->pattern[x][y];
-			k2->original[x][y] = k2->pattern[x][y];
+			k->original[x][y] = k->answer[x][y];
+			k2->original[x][y] = k2->answer[x][y];
 			flag = 0;
 		}
 	}
